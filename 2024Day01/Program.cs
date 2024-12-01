@@ -35,7 +35,7 @@ class Program
 
         part1_sum = getPart1result(lList, rList);
 
-        Console.WriteLine(part1_sum);
+        Console.WriteLine($"Part 1 result: {part1_sum}");
 
     }
 
