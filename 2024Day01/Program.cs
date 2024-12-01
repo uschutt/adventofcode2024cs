@@ -17,6 +17,7 @@ class Program
         var lList = new List<int>();
         var rList = new List<int>();
         int part1_sum = 0;
+        int part2_sum = 0;
 
         foreach (string s in data)
         {
@@ -34,28 +35,53 @@ class Program
         rList.Sort();
 
         part1_sum = getPart1result(lList, rList);
-
         Console.WriteLine($"Part 1 result: {part1_sum}");
+
+        part2_sum = getPart2result(lList, rList);
+        Console.WriteLine($"Part 2 result: {part2_sum}");
 
     }
 
     static int getPart1result(List<int> _lList, List<int> _rList)
     {
-        
+
         int sum = 0;
-        
+
         for (int ix = 0; ix < _lList.Count; ix++)
         {
             sum += GetDiff(_lList[ix], _rList[ix]);
-        }        
-        
+        }
+
         return sum;
 
+    }
+    static int getPart2result(List<int> _lList, List<int> _rList)
+    {
+        int sum = 0;
+
+        foreach (int i in _lList)
+        {
+            sum += (count_occurence(_rList, i) * i);
+        }
+
+        return sum;
+    }
+
+    static int count_occurence(List<int> _list, int _value)
+    {
+        int cnt = 0;
+        foreach (int i in _list)
+        {
+            if (i == _value) cnt++;
+            if (i > _value) break;
+
+        }
+        return cnt;
     }
 
     static int GetDiff(int _int1, int _int2)
     {
-        return Math.Abs(_int2- _int1);
+        return Math.Abs(_int2 - _int1);
     }
 
     static string ReplaceMultipleSpaces(string input)
