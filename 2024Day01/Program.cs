@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
+using Microsoft.VisualBasic;
 
 class Program
 {
@@ -32,12 +33,23 @@ class Program
         lList.Sort();
         rList.Sort();
 
-        for (int ix = 0; ix < lList.Count; ix++)
-        {
-            part1_sum += GetDiff(lList[ix], rList[ix]);
-        }
+        part1_sum = getPart1result(lList, rList);
 
         Console.WriteLine(part1_sum);
+
+    }
+
+    static int getPart1result(List<int> _lList, List<int> _rList)
+    {
+        
+        int sum = 0;
+        
+        for (int ix = 0; ix < _lList.Count; ix++)
+        {
+            sum += GetDiff(_lList[ix], _rList[ix]);
+        }        
+        
+        return sum;
 
     }
 
