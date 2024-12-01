@@ -1,0 +1,96 @@
+# DotNet artifacts
+bin/
+obj/
+
+# Rider project files
+.idea/
+*.sln.iml
+
+# User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Mono auto generated files
+mono_crash.*
+
+# Windows image file caches
+Thumbs.db
+ehthumbs.db
+
+# Folder config file
+Desktop.ini
+
+# Recycle Bin used on file shares
+$RECYCLE.BIN/
+
+# VS Code specific
+.vscode/
+*.code-workspace
+
+# VS specific
+.vs/
+*.sln*
+*.csproj.user
+*.suo
+*.ntvs*
+*.njsproj
+*.vcxproj*
+*.vcproj*
+
+# NuGet
+*.nupkg
+*.snupkg
+.nuget/
+packages/
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# Build directories
+bin/
+obj/
+out/
+
+# JetBrains Rider
+.idea/
+*.idea
+*.iml
+*.ipr
+*.iws
+
+# Logs
+*.log
+logs/
+
+# Generated files
+*.g.*
+*.gen.cs
+*.Generated.cs
+
+# Resharper and other IDEs
+_ReSharper.Caches/
+
+# Coverage and test results
+*.coverage
+*.coveragexml
+*.testlog
+TestResults/
+
+# Visual Studio temporary files
+*.tmp
+
+# Configuration files
+*.config
+appsettings.*.json
+
+# Lock files
+*.lock
+
+# Transient SQLite database
+*.db
+*.sqlite
+
+testdata.txt 
+data.txt
