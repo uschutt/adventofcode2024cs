@@ -1,5 +1,0 @@
-nytt projekt:
-dotnet new console -n MyFirstApp
-
-kör:
-dotnet run

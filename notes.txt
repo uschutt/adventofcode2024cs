@@ -1,0 +1,5 @@
+nytt projekt:
+dotnet new console -n 2024Day
+
+kör:
+dotnet run
