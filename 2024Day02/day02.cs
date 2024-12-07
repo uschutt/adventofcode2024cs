@@ -33,6 +33,8 @@ class day02
         Console.WriteLine($"Result part2: {cnt}");
         // 392 to high
         // 365 to low
+        // 380 incorrect - including 
+        // 369 incorrect
     }
 
 
@@ -120,42 +122,138 @@ class day02
         return returnValue;
     }
 
+    static bool CheckReportAsc(List<int> _iReportList, bool _bIncreasing, bool _bSkip = true, bool _bDebug = false)
+    {
+
+        bool bSkip = _bSkip;
+        bool bResult = true;
+        int diff;
+        int iLowLimit;
+        int iHighLimit;
+        int iBadIx = -1;
+        List<int> iReportList;
+        string sDebugText = "";
+
+        if (_bIncreasing)
+        {
+            iLowLimit = 1;
+            iHighLimit = 3;
+        }
+        else
+        {
+            iLowLimit = -3;
+            iHighLimit = -1;
+        }
+
+        for (int ix = 1; ix < _iReportList.Count; ix++)
+        {
+
+            diff = (_iReportList[ix] - _iReportList[ix - 1]);
+
+            bResult = !(diff < iLowLimit || diff > iHighLimit);
+
+            if (!bResult) iBadIx = ix;
+
+            if (_bDebug) sDebugText = $"index: {ix} | diff: {diff,3} | Bad index: {iBadIx,3} | result: {bResult,-5} | ";
+
+            if (_bDebug) debugPrint(_iReportList, bSkip, sDebugText);
+
+            if (!bResult) break;
+
+        }
+
+        // if skip == true remove and test again
+        if (bSkip && iBadIx != -1)
+        {
+            if (_bDebug) Console.WriteLine();
+            if (_bDebug) Console.WriteLine("Implement Problem Dampner");
+            iReportList = _iReportList.ToList();
+            iReportList.RemoveAt(iBadIx);
+            bResult = CheckReportAsc(iReportList, _bIncreasing, false, _bDebug);
+        }
+
+        // if skip but result still == false - remove first level and test again
+        if (bSkip && !bResult)
+        {
+            if (_bDebug) Console.WriteLine();
+            if (_bDebug) Console.WriteLine("Implement Problem Dampner on first level");
+            iReportList = _iReportList.ToList();
+            iReportList.RemoveAt(0);
+            bResult = CheckReportAsc(iReportList, _bIncreasing, false, _bDebug);
+        }
+
+        return bResult;
+    }
+
+    static void debugPrint(List<int> _iReportList, bool _bSkip = true, string _sText = "")
+    {
+        string sReport = "";
+        foreach (int iReport in _iReportList) sReport += ' ' + iReport.ToString();
+
+        sReport = $"data: {sReport} | skip: {_bSkip,-5}";
+        if (_sText != "") sReport = $"{sReport} | {_sText}";
+
+        Console.WriteLine(sReport);
+    }
+
+
     static int GetResultPart2(List<string> _dataList)
     {
         int cnt = 0;
-        int line_result = -1;
+        int ix = 0;
+        bool bResult = false;
+        string sResult = "";
+        string sResultLine = "";
+        string[] sReportArray;
+        List<int> iReportList;
+        string sReport = "";
+        string sTest = "59 57 56 53 54 53 52";
+        bool bDebug = false;
 
-        List<string> safeList = new List<string>();
-        List<string> unSafeList = new List<string>();
-        List<string> diffList = new List<string>();
-        foreach (string d in _dataList)
+
+        // bDebug = (sTest != "");
+
+        List<string> resultList = new List<string>();
+
+        foreach (string report in _dataList)
         {
-            line_result = CheckLinePart2(d);
-            if (line_result == -1)
-            {
-                safeList.Add(d);
-                cnt++;
-            }
-            else
-            {
-                unSafeList.Add(RemoveLevel(d, line_result));
-            }
+            // testa om asc
+            // testa om desc
+            // testa om asc utan första
+            // testa om desc utan första
+
+            if (bDebug && sTest != "") sReport = sTest; else sReport = report;
+
+            // split row to array
+            sReportArray = sReport.Split(' ');
+
+            // convert string array to int list
+            iReportList = sReportArray.Select(int.Parse).ToList();
+
+            // check increasing 
+            if (bDebug) Console.WriteLine("");
+            if (bDebug) Console.WriteLine("check increasing");
+            bResult = CheckReportAsc(iReportList, true, true, bDebug);
+
+            // check decreasing
+            if (bDebug) Console.WriteLine("");
+            if (bDebug) Console.WriteLine($"check decreasing | result from increasing: {bResult}");
+            if (!bResult) bResult = CheckReportAsc(iReportList, false, true, bDebug);
+
+            if (bResult) cnt++;
+
+            ix++;
+            if (bResult) sResult = "True"; else sResult = "False";
+
+            sResultLine = $"{ix} | {sReport} | {sResult}";
+
+            resultList.Add(sResultLine);
+
+            if (bDebug) break;
+
         }
 
-        foreach (string l in unSafeList)
-        {
-            line_result = CheckLinePart2(l);
-            if (line_result == -1)
-            {
-                safeList.Add(l);
-                cnt++;
-            }
-            else diffList.Add(l);
-        }
-
-        // Console.WriteLine(safeList.Count());
-        // diffList = ConvertToDiffList(safeList);
-        // printList(diffList);
+        writeListToFile(resultList, "result_cs.txt");
 
         return cnt;
     }
