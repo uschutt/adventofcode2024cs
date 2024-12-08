@@ -41,51 +41,60 @@ static List<(int, int)> ExtractPairs(string _sInput, string _sPattern)
     return pairs;
 }
 
+static int countLine(string _sData)
+{
+
+    string sPattern = @"mul\((\d{1,3}),(\d{1,3})\)";
+
+    List<(int, int)> iMulsList = ExtractPairs(_sData, sPattern);
+
+    int iSum = 0;
+    int iFactor1 = 1;
+    int iFactor2 = 1;
+    int iProduct = 0;
+    int ix = 0;
+
+    foreach (var mul in iMulsList)
+    {
+
+        iFactor1 = mul.Item1;
+        iFactor2 = mul.Item2;
+        iProduct = iFactor1 * iFactor2;
+        iSum += iProduct;
+        ix++;
+
+        Console.WriteLine($"{ix,3} | {iFactor1,3} * {iFactor2,3} = {iProduct,7} | accSum: {iSum,9}");
+    }
+
+    return iSum;
+
+}
 
 string filePath = "data.txt";
 string sData = ReadFileToString(filePath);
 
 // string sData = "xmul(2,4)&mul[3,7]!^don't()_mul(5,5)+mul(32,64](mul(11,8)undo()?mul(8,5))";
-
-sData = $"do(){sData}";
-
 if (sData.Contains('|')) Console.WriteLine("The string contains '|'."); else Console.WriteLine("The string does NOT contains '|'.");
 
 sData = sData.Replace("do()", "|do()");
 sData = sData.Replace("don't()", "|don't()");
+sData = $"do(){sData}";
 
 List<string> sDataList = sData.Split('|').ToList();
 
 Console.Clear();
 
 int ix = 0;
+int iSum = 0;
 
 foreach (string part in sDataList)
 {
     ix++;
     Console.WriteLine($"{ix,3} | {part}");
+    if (part.StartsWith("do()"))
+    {
+        iSum += countLine(part);
+    }
 }
 
-
-// string sPattern = @"mul\((\d{1,3}),(\d{1,3})\)";
-
-// List<(int, int)> iMulsList = ExtractPairs(sData, sPattern);
-
-// int iSum = 0;
-// int iFactor1 = 1;
-// int iFactor2 = 1;
-// int iProduct = 0;
-// int ix = 0;
-
-// foreach (var mul in iMulsList)
-// {
-
-//     iFactor1 = mul.Item1;
-//     iFactor2 = mul.Item2;
-//     iProduct = iFactor1 * iFactor2;
-//     iSum += iProduct;
-//     ix++;
-
-//     Console.WriteLine($"{ix,3} | {iFactor1,3} * {iFactor2,3} = {iProduct,7} | accSum: {iSum,9}");
-// }
-
+Console.WriteLine($"Answer part 2: {iSum}");
