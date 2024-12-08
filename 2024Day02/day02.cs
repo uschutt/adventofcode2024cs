@@ -154,6 +154,8 @@ class day02
 
             if (!bResult) iBadIx = ix;
 
+            // if (!_bIncreasing && _iReportList[ix - 1] < _iReportList[ix]) iBadIx = ix - 1;
+
             if (_bDebug) sDebugText = $"index: {ix} | diff: {diff,3} | Bad index: {iBadIx,3} | result: {bResult,-5} | ";
 
             if (_bDebug) debugPrint(_iReportList, bSkip, sDebugText);
@@ -210,8 +212,7 @@ class day02
         string sTest = "59 57 56 53 54 53 52";
         bool bDebug = false;
 
-
-        // bDebug = (sTest != "");
+        bDebug = (sTest != "");
 
         List<string> resultList = new List<string>();
 
