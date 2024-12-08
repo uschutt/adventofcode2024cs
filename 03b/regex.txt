@@ -1,0 +1,18 @@
+mul\((\d{1,3}),(\d{1,3})\)
+
+184576302
+
+mul
+\(
+    (\d{1,3})
+    ,
+    (\d{1,3})
+\)
+
+\(          = escapes "(" 
+\)          = escapes ")"
+
+\d          = any digit
+(\d{1,3})   = any number with 1-3 digit(s)
+
+
