@@ -17,22 +17,23 @@ static List<string> AddFrame(List<string> _sInputList)
 
     List<string> sOutputList = new List<string>();
 
+
+
     int iLength = _sInputList[0].Length;
 
-    // top line with 140 + 3 + 3 W
-    sOutputList.Add(new string('W', iLength + 3 + 3));
-    sOutputList.Add(new string('W', iLength + 3 + 3));
-    sOutputList.Add(new string('W', iLength + 3 + 3));
+    // add three lines with W at the top
+    // top line width 140 + 3 + 3 W
+    for (int i = 1; i <= 3; i++) sOutputList.Add(new string('W', iLength + 3 + 3));
 
+    // Add three W at start and end of every line
     foreach (string sLine in _sInputList)
     {
         sOutputList.Add($"WWW{sLine}WWW");
     }
 
+    // add 3 lines with W at the bottom
     // bottom line with 140 + 3 + 3 W
-    sOutputList.Add(new string('W', iLength + 3 + 3));
-    sOutputList.Add(new string('W', iLength + 3 + 3));
-    sOutputList.Add(new string('W', iLength + 3 + 3));
+    for (int i = 1; i <= 3; i++) sOutputList.Add(new string('W', iLength + 3 + 3));
 
     return sOutputList;
 
@@ -98,12 +99,16 @@ bool bDebug = false;
 
 List<string> sDataList = ReadFileToList(sFilePath);
 
+// first of all we make sure that we dont get out of bounds when checking in every direction
 sDataList = AddFrame(sDataList);
 
-foreach (string sLine in sDataList)
+if (bDebug)
 {
-    if (bDebug) Console.WriteLine($"{ix,3} | {sLine}");
-    ix++;
+    foreach (string sLine in sDataList)
+    {
+        Console.WriteLine($"{ix,3} | {sLine}");
+        ix++;
+    }
 }
 
 iResult = CountXMAS(sDataList);
