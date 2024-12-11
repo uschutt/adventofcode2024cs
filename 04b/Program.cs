@@ -39,33 +39,37 @@ static List<string> AddFrame(List<string> _sInputList)
 
 }
 
-static bool CheckRowCol(List<string> _sInputList, int _iRow, int _iCol, string _sXMAS, int _iRowDir, int _iColDir, bool _debug = false)
+static bool CheckRowCol(List<string> _sInputList, int _iRow, int _iCol, string _sXMAS, int _iRowDir, int _iColDir, bool _debug = false, string _sDebugText = "")
 {
     string sXMAS = "";
+    bool bReturnValue = false;
 
-    // int iRow = _iRow + _iRowDir;
-    // int iCol = _iCol + _iColDir;
+    if (_debug) Console.WriteLine($"{_sDebugText} | _iRow = {_iRow} | _iCol = {_iCol}");
 
     int iRow = _iRow;
     int iCol = _iCol;
 
-    // om dir = ( 1, 1) = 4,5 -> 3,4
-    // om dir = (-1,-1) = 4,5 -> 5,6
-    if (_iRowDir == -1) iRow = iRow + 1; else if (_iRowDir == 1) iRow = iRow - 1;
-    if (_iColDir == -1) iCol = iCol + 1; else if (_iColDir == 1) iCol = iCol - 1;
-
-
-
     for (int i = 0; i <= _sXMAS.Length - 1; i++)
     {
-        if (_debug) Console.WriteLine($"({iRow},{iCol}) {sXMAS}");
+
         sXMAS += _sInputList[iRow][iCol];
+        if (_debug) Console.WriteLine($"({iRow},{iCol}) {sXMAS}");
         iRow += _iRowDir;
         iCol += _iColDir;
 
     }
 
-    return (sXMAS == _sXMAS);
+    bReturnValue = (sXMAS == _sXMAS);
+
+    if (_debug) Console.WriteLine($"({sXMAS} == {_sXMAS}) == {bReturnValue}");
+
+    if (!bReturnValue)
+    {
+        bReturnValue = (sXMAS == reverseString(_sXMAS));
+        if (_debug) Console.WriteLine($"({sXMAS} == {reverseString(_sXMAS)}) == {bReturnValue}"); ;
+    }
+
+    return bReturnValue;
 
 }
 
@@ -77,6 +81,8 @@ static int CountXMAS(List<string> _sInputList, string _sXMAS = "MAS", bool _bDeb
     int iStartCol = 3;
     int iEndCol = _sInputList[0].Length - 4;
     int iXMASCount = 0;
+    bool bCheck1 = false;
+    bool bCheck2 = false;
 
     for (int iRow = iStartRow; iRow <= iEndRow; iRow++)
     {
@@ -88,12 +94,22 @@ static int CountXMAS(List<string> _sInputList, string _sXMAS = "MAS", bool _bDeb
         {
             if (_sInputList[iRow][iCol] == _sXMAS[_iCharIndex])
             {
+                if (_bDebug) Console.WriteLine("----------------------------------------------------------------------------start");
                 if (_bDebug) Console.WriteLine($"({iRow},{iCol})={_sXMAS[_iCharIndex]}");
                 // uppåt vänster och uppåt höger
-                if (CheckRowCol(_sInputList, iRow, iCol, _sXMAS, -1, -1, _bDebug) && CheckRowCol(_sInputList, iRow, iCol, _sXMAS, -1, 1, _bDebug)) iXMASCount++;
 
-                // nedåt höger och nedåt vänster
-                if (CheckRowCol(_sInputList, iRow, iCol, _sXMAS, 1, 1, _bDebug) && CheckRowCol(_sInputList, iRow, iCol, _sXMAS, 1, -1, _bDebug)) iXMASCount++;
+                // look Up & Left
+                // first move down & right -> down = iRow +1 | right = iCol +1
+                bCheck1 = CheckRowCol(_sInputList, iRow + 1, iCol + 1, _sXMAS, -1, -1, _bDebug, "up le");
+
+                // look Up & Right
+                // first move down and left -> down = iRow +1 | left = iCol - 1
+                bCheck2 = CheckRowCol(_sInputList, iRow + 1, iCol - 1, _sXMAS, -1, 1, _bDebug, "up ri");
+
+                if (bCheck1 && bCheck2) iXMASCount++;
+
+                if (_bDebug) Console.WriteLine("------------------------------------------------------------------------------end");
+                if (_bDebug) Console.WriteLine(iXMASCount);
             }
         }
     }
@@ -102,8 +118,22 @@ static int CountXMAS(List<string> _sInputList, string _sXMAS = "MAS", bool _bDeb
 
 }
 
-// string sFilePath = "data.txt";
-string sFilePath = "testdata.txt";
+static string reverseString(string _sInput)
+{
+
+    // Convert the string to a character array
+    char[] charArray = _sInput.ToCharArray();
+
+    // Reverse the character array
+    Array.Reverse(charArray);
+
+    // Create a new string from the reversed character array
+    return new string(charArray);
+
+}
+
+string sFilePath = "data.txt";
+// string sFilePath = "testdata.txt";
 int iResult = 0;
 int ix = 0;
 bool bDebug = false;
@@ -122,6 +152,6 @@ if (bDebug)
     }
 }
 
-iResult = CountXMAS(sDataList, "MAS", true, 1);
+iResult = CountXMAS(sDataList, "MAS", bDebug, 1);
 
 Console.WriteLine($"Result 04b: {iResult}");
