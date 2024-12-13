@@ -132,6 +132,7 @@ class day02
         int iHighLimit;
         int iBadIx = -1;
         List<int> iReportList;
+
         string sDebugText = "";
 
         if (_bIncreasing)
@@ -164,24 +165,19 @@ class day02
 
         }
 
-        // if skip == true remove and test again
-        if (bSkip && iBadIx != -1)
-        {
-            if (_bDebug) Console.WriteLine();
-            if (_bDebug) Console.WriteLine("Implement Problem Dampner");
-            iReportList = _iReportList.ToList();
-            iReportList.RemoveAt(iBadIx);
-            bResult = CheckReportAsc(iReportList, _bIncreasing, false, _bDebug);
-        }
-
         // if skip but result still == false - remove first level and test again
         if (bSkip && !bResult)
         {
             if (_bDebug) Console.WriteLine();
             if (_bDebug) Console.WriteLine("Implement Problem Dampner on first level");
-            iReportList = _iReportList.ToList();
-            iReportList.RemoveAt(0);
-            bResult = CheckReportAsc(iReportList, _bIncreasing, false, _bDebug);
+
+            for (int i = 0; i < _iReportList.Count; i++)
+            {
+                iReportList = _iReportList.ToList();
+                iReportList.RemoveAt(i);
+                bResult = CheckReportAsc(iReportList, _bIncreasing, false, _bDebug);
+                if (bResult) break;
+            }
         }
 
         return bResult;
@@ -212,7 +208,7 @@ class day02
         string sTest = "59 57 56 53 54 53 52";
         bool bDebug = false;
 
-        bDebug = (sTest != "");
+        // bDebug = (sTest != "");
 
         List<string> resultList = new List<string>();
 
