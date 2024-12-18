@@ -69,34 +69,63 @@ static int[] ChangeDirection(int[] _iDirectionInput)
     }
 }
 
-static int[] AddPositionToList(List<int[]> _iVisitedPositions)
+static void AddPositionToList(List<string> _sVisitedPositionsList, int[] _iNewPositionArray)
 {
-    _iVisitedPositions.Add([7, 7]);
-    return [7, 7];
+    string sNewPosition = string.Join("|", _iNewPositionArray);
+
+    if (!_sVisitedPositionsList.Contains(sNewPosition)) _sVisitedPositionsList.Add(sNewPosition);
 }
 
-// string sFilePath = "data.txt";
-string sFilePath = "testdata.txt";
+string sFilePath = "data.txt";
+// string sFilePath = "testdata.txt";
 
-List<string> sDataList = ReadFileToList(sFilePath);
-List<int[]> iVisitedPositions = new List<int[]>();
+List<string> sMapList = ReadFileToList(sFilePath);
+List<string> sVisitedPositionsList = new List<string>();
 string sStartPosition;
 string[] sStartPositionArray;
-int[] iCurrentPosition;
+int[] iCurrentPositionArray;
+int[] iCurrentDirectionArray;
+int x_max = sMapList.Count;
+int y_max = sMapList[0].Length;
+int x;
+int y;
 
-foreach (string sLine in sDataList)
-{
-    Console.WriteLine(sLine);
-}
+print($"x_max: {x_max} | y_max: {y_max}");
 
-sStartPosition = GetStartPosition(sDataList);
+// foreach (string sLine in sMapList) Console.WriteLine(sLine);
+
+sStartPosition = GetStartPosition(sMapList);
 print(sStartPosition);
 
 sStartPositionArray = sStartPosition.Split('|');
 
-iCurrentPosition = [int.Parse(sStartPositionArray[0]), int.Parse(sStartPositionArray[1])];
-iVisitedPositions.Add(iCurrentPosition);
+iCurrentPositionArray = [int.Parse(sStartPositionArray[0]), int.Parse(sStartPositionArray[1])];
 
-iCurrentPosition = AddPositionToList(iVisitedPositions);
+AddPositionToList(sVisitedPositionsList, iCurrentPositionArray);
 
-print($"result 06a: {iVisitedPositions.Count}");
+x = iCurrentPositionArray[0];
+y = iCurrentPositionArray[1];
+iCurrentDirectionArray = [-1, 0];
+
+while (x < x_max && y < y_max && x >= 0 && y >= 0)
+{
+    print($"x: {x,3} | y: {y,3}");
+    if (sMapList[x][y] == '#')
+    {
+        // print($"x: {x,3} | y: {y,3} | turn");
+        // we are on the obsticle - back one step
+        x = x - iCurrentDirectionArray[0];
+        y = y - iCurrentDirectionArray[1];
+        // ... and change direction
+        iCurrentDirectionArray = ChangeDirection(iCurrentDirectionArray);
+    }
+    else
+    {
+        AddPositionToList(sVisitedPositionsList, [x, y]);
+        x = x + iCurrentDirectionArray[0];
+        y = y + iCurrentDirectionArray[1];
+    }
+}
+
+
+print($"result 06a: {sVisitedPositionsList.Count}");
