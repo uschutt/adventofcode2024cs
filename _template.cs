@@ -32,8 +32,4 @@ static void print(string sText)
 string sFilePath = "testdata.txt";
 
 List<string> sDataList = ReadFileToList(sFilePath);
-
-foreach (string sLine in sDataList)
-{
-    Console.WriteLine(sLine);
-}
+foreach (string sLine in sDataList) print(sLine);
