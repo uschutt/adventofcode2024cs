@@ -86,7 +86,7 @@ class Program08a
         List<Frequency> oFilteredFrequencyList;
         char cFrequency;
         int x_max, y_max;
-        Frequency newObj, oDistance, oAntiNode1, oAntiNode2;
+        Frequency newObj, oDistance;
         List<Frequency> oAntiNodeList = new List<Frequency>();
         Frequency[] oAntiNodeArray;
         bool bDebug = false;
@@ -135,10 +135,8 @@ class Program08a
                     {
                         if (bDebug) oTo.print();
                         oDistance = oTo - oFrom;
-                        oAntiNode1 = oFrom - oDistance;
-                        oAntiNode2 = oTo + oDistance;
 
-                        oAntiNodeArray = [oAntiNode1, oAntiNode2];
+                        oAntiNodeArray = [oFrom - oDistance, oTo + oDistance];
 
                         foreach (Frequency oAntiNode in oAntiNodeArray)
                         {
