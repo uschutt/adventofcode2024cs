@@ -1,8 +1,8 @@
 ﻿class Frequency
 {
     public char Character;
-    private int x;
-    private int y;
+    public int x;
+    public int y;
 
     public Frequency(char _cCharacter, int _x, int _y)
     {
@@ -64,9 +64,11 @@
         return HashCode.Combine(Character, x, y);
     }
 
-    public void print()
+    public void print(string _prefix = "")
     {
-        Console.WriteLine($"Frequency: {Character} | Position (x,y): ({x},{y})");
+        string sText = $"Frequency: {Character} | Position (x,y): ({x},{y})";
+        if (_prefix != "") sText = $"{_prefix} | {sText}";
+        Console.WriteLine(sText);
     }
 
 }
@@ -76,15 +78,18 @@ class Program08a
 
     static void Main(string[] args)
     {
-        // string sFilePath = "data.txt";
-        string sFilePath = "testdata.txt";
+        string sFilePath = "data.txt";
+        // string sFilePath = "testdata.txt";
 
         List<char> cFrequencyList = new List<char>();
         List<Frequency> oFrequencyList = new List<Frequency>();
         List<Frequency> oFilteredFrequencyList;
         char cFrequency;
         int x_max, y_max;
-        Frequency newObj;
+        Frequency newObj, oDistance, oAntiNode1, oAntiNode2;
+        List<Frequency> oAntiNodeList = new List<Frequency>();
+        Frequency[] oAntiNodeArray;
+        bool bDebug = false;
 
         List<string> sDataList = ReadFileToList(sFilePath);
         foreach (string sLine in sDataList) print(sLine);
@@ -109,54 +114,69 @@ class Program08a
         }
 
         // lista de olika frekvenserna
-        foreach (char f in cFrequencyList) print($"{f}");
+        if (bDebug) foreach (char f in cFrequencyList) print($"{f}");
 
         // sortera listan med objekt, sortera på frekvens
         oFrequencyList.Sort((f1, f2) => f1.Character.CompareTo(f2.Character));
 
-        // skriv ut en lista över alla frekvenser med sina koordinater
-        // foreach (Frequency f in oFrequencyList) f.print();
-
-        // coming up
-        // för varje unik frekvens
-        //    - hitta alla förekomster av samma frekvens
-        //         - räkna ut riktning och avstånd mellan utgångspunkten och förekomsten, använd avstånd och riktning för att 
-        //              - hitta antinoden hos kompisen -> lägg till i lista med antinoder (av typen Frequency) om den inte redan finns
-        //              - hitta antinoden hos den egna -> lägg till i lista med antinoder (av typen Frequency) om den inte redan finns
-
-        if (1 == 2)
+        foreach (char f in cFrequencyList)
         {
-            foreach (char f in cFrequencyList)
+            oFilteredFrequencyList = FilterFrequencyList(oFrequencyList, f);
+            if (bDebug) print($"--------------------------------------------------------------------------------------------------------{f}");
+
+            foreach (Frequency oFrom in oFilteredFrequencyList)
             {
-                oFilteredFrequencyList = FilterFrequencyList(oFrequencyList, f);
-                print($"--------------------------------------------------------------------------------------------------------{f}");
 
-                foreach (Frequency oFrom in oFilteredFrequencyList)
+                if (bDebug) oFrom.print();
+                if (bDebug) print("------------------------------------");
+                foreach (Frequency oTo in oFilteredFrequencyList)
                 {
-
-                    oFrom.print();
-                    print("------------------------------------");
-                    foreach (Frequency oTo in oFilteredFrequencyList)
+                    if (oTo != oFrom)
                     {
-                        if (oTo != oFrom)
+                        if (bDebug) oTo.print();
+                        oDistance = oTo - oFrom;
+                        oAntiNode1 = oFrom - oDistance;
+                        oAntiNode2 = oTo + oDistance;
+
+                        oAntiNodeArray = [oAntiNode1, oAntiNode2];
+
+                        foreach (Frequency oAntiNode in oAntiNodeArray)
                         {
-                            // int iDistance = GetDistance(oFrom, oTo);
-                            // int iDirection = GetDirection(oFrom, oTo);
-                            oTo.print();
+                            oAntiNode.Character = '#';
+                            if (!IsOutOfBounds(oAntiNode, x_max, y_max) && !oAntiNodeList.Contains(oAntiNode))
+                            {
+                                oAntiNodeList.Add(oAntiNode);
+                                if (bDebug) oAntiNode.print("Added antinode: ");
+                            }
                         }
+
                     }
-                    print("------------------------------------");
                 }
+                if (bDebug) print("------------------------------------");
             }
         }
 
-        Frequency obj1 = new Frequency('a', 4, 4);
-        Frequency obj2 = new Frequency('a', 5, 2);
+        print($"Antinode count: {oAntiNodeList.Count}");
+        if (bDebug) foreach (Frequency an in oAntiNodeList) an.print();
+    }
 
-        Frequency obj3 = obj2 - obj1;
+    static bool IsOutOfBounds(Frequency _node, int _x_max, int _y_max)
+    {
+        return !((_node.x >= 0 && _node.x <= _x_max) && _node.y >= 0 && _node.y <= _y_max);
+    }
 
-        obj3.print();
+    static void TestFrequencyObject()
+    {
+        Frequency oLocal = new Frequency('0', 4, 4);
+        Frequency oRemote = new Frequency('0', 5, 2);
 
+        Frequency oDistance = oRemote - oLocal;
+        Frequency oAntiNode1 = oLocal - oDistance;
+        Frequency oAntiNode2 = oRemote + oDistance;
+
+        oDistance.print("Distance: ");
+        oAntiNode1.print("AntiNode 1: ");
+        oAntiNode2.print("AntiNode 2: ");
     }
 
     static List<Frequency> FilterFrequencyList(List<Frequency> _oInputFrequencyList, char _cFrequency)
