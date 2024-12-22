@@ -23,11 +23,12 @@ static string CompressDiskMap(string _sInputDiskMap)
     string sOutputDiskMap = "";
     int ixf, ixb;
     char cEmpty = (char)65000;
+    int iFileBlockCount = CountFileBlocks(_sInputDiskMap);
 
     ixf = 0; // from the front
     ixb = _sInputDiskMap.Length - 1; // from the back
 
-    while (ixf < ixb)
+    while (sOutputDiskMap.Length < iFileBlockCount)
     {
 
         if ((int)_sInputDiskMap[ixf] != (int)cEmpty)
@@ -57,7 +58,6 @@ static ulong CalculateChecksum(string _sString)
     {
         iValue = (int)_sString[i];
         iChecksum = iChecksum + ((ulong)iValue * (ulong)i);
-        // print($"{i,4} | Value: {iValue} | {(ulong)iValue * (ulong)i} | Checksum: {iChecksum}");
 
     }
 
