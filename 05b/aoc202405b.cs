@@ -23,6 +23,7 @@ static int pageUpdateLineIsValid(string _sUpdateLine, List<int[]> _iRuleList, bo
     int[] iTestRuleArr;
     int iTemp;
     string sNewUpdateLine = _sUpdateLine;
+    int ix = 0;
 
     // convert the input string into a list of int
     string[] sUpdateLineArray = _sUpdateLine.Split(',');
@@ -30,8 +31,6 @@ static int pageUpdateLineIsValid(string _sUpdateLine, List<int[]> _iRuleList, bo
 
     foreach (int iPage in iUpdateLineList)
     {
-        // if (_bDebug) Console.WriteLine();
-        // if (_bDebug) Console.WriteLine($"Page {iPage} in update list: {_sUpdateLine}");
         bResult = pageIsValid(iUpdateLineList, iPage, iPageIx, _iRuleList, false);
         if (!bResult) break;
         iPageIx++;
@@ -39,17 +38,20 @@ static int pageUpdateLineIsValid(string _sUpdateLine, List<int[]> _iRuleList, bo
 
     if (!bResult) // now we are looking for the invalid updates
     {
-        Console.WriteLine("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -");
-        Console.WriteLine(_sUpdateLine);
+        if (_bDebug) Console.WriteLine("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -");
+        if (_bDebug) Console.WriteLine(_sUpdateLine);
 
         // filter rule list, only pages occuring in iUpdateLineList shall be kept
         List<int[]> iFilteredRuleList = filterRuleListByPageList(_iRuleList, iUpdateLineList);
 
         // printRuleList(iFilteredRuleList);
 
+
+
         if (!bResult)
         {
-            for (int ix = 0; ix < iUpdateLineList.Count - 1; ix++)
+
+            while (ix <= iUpdateLineList.Count - 2)
             {
                 iTestRuleArr = [iUpdateLineList[ix], iUpdateLineList[ix + 1]];
                 if (!RuleExists(iTestRuleArr, iFilteredRuleList))
@@ -65,13 +67,15 @@ static int pageUpdateLineIsValid(string _sUpdateLine, List<int[]> _iRuleList, bo
                     sNewUpdateLine = string.Join(",", iUpdateLineList);
 
                     ix = 0; //start over
-
+                }
+                else
+                {
+                    ix++;
                 }
 
             }
 
             sNewUpdateLine = string.Join(",", iUpdateLineList);
-            Console.WriteLine(sNewUpdateLine);
 
             iReturnValue = getMiddlePageNumber(iUpdateLineList);
         }
@@ -110,21 +114,18 @@ static int getMiddlePageNumber(List<int> _iUpdateLineList, bool _bDebug = true)
     int iRecordCount = _iUpdateLineList.Count;
     int iMiddleIndex = iRecordCount / 2;
 
-    if (_bDebug) Console.WriteLine($"RecordCount: {iRecordCount} | MiddleIndex: {iMiddleIndex} | Middle value: {_iUpdateLineList[iMiddleIndex]}");
-    if (_bDebug) Console.WriteLine();
+    if (_bDebug) Console.WriteLine($"RecordCount: {iRecordCount,3} | MiddleIndex: {iMiddleIndex,2} | Middle value: {_iUpdateLineList[iMiddleIndex]}");
+
     return _iUpdateLineList[iMiddleIndex];
 }
 
 static bool pageIsValid(List<int> _iUpdateLineList, int _iPage, int _iPageIx, List<int[]> _iRuleList, bool _bDebug = false)
 {
-
     bool bReturnValue = true;
-    // int[] iReturnValueArray = [];
-
-    // bReturnValue = (_iPage == _iUpdateLineList[_iPageIx]);
 
     // filter rule list
     List<int[]> iFilteredRuleList = filterRuleListByPage(_iRuleList, _iPage);
+
     if (_bDebug) printRuleList(iFilteredRuleList);
 
     // foreach rule in filterd list
@@ -157,7 +158,7 @@ static bool pageMatchRule(List<int> _iUpdateLineList, int _iPage, int _iPageIx, 
             }
         }
     }
-    else
+    else if (_iPage == _iRule[1])
     {
         for (int ix = _iPageIx; ix < _iUpdateLineList.Count; ix++)
         {
@@ -212,8 +213,8 @@ static List<int[]> filterRuleListByPage(List<int[]> _iRuleList, int _iFilterPage
     return iFilteredRuleList;
 }
 
-// string sFilePath = "data.txt";
-string sFilePath = "testdata.txt";
+string sFilePath = "data.txt";
+// string sFilePath = "testdata.txt";
 // string sFilePath = "05bdata.txt";
 
 List<string> sDataList = ReadFileToList(sFilePath);
@@ -248,8 +249,7 @@ foreach (string sLine in sDataList)
 
 foreach (string sPageUpdateLine in sPageUpdateList)
 {
-    // string sPageUpdateLine = "97,13,75,29,47";
-    int iLineResult = pageUpdateLineIsValid(sPageUpdateLine, iRulesList, true);
+    int iLineResult = pageUpdateLineIsValid(sPageUpdateLine, iRulesList, false);
     if (iLineResult != -1)
     {
         iCount05b++;
@@ -260,10 +260,8 @@ foreach (string sPageUpdateLine in sPageUpdateList)
         iCount05a++;
         iResult05a += iLineResult;
     }
-    Console.WriteLine($"Acc Result 05b: {iCount05b}");
 }
 
-Console.WriteLine($"Result 05a: {iResult05a,5} | Count 05a: {iCount05a,4}");
+Console.WriteLine("------------------------------------------------------");
 Console.WriteLine($"Result 05b: {iResult05b,5} | Count 05b: {iCount05b,4}");
-Console.WriteLine($"Count 05:   {sPageUpdateList.Count}");
-// 5959 to low
+Console.WriteLine("------------------------------------------------------");
