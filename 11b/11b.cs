@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Threading;
+using System.Threading.Tasks;
 
 class Program11b
 {
-    static string __sFilePath = "testdata.txt";
-    static int __iMaxLevel = 50;
+    static string __sFilePath = "data.txt";
+    static int __iMaxLevel = 25;
     static int __iTotalCount = 0;
 
     static void Main(string[] args)
@@ -12,16 +14,26 @@ class Program11b
         string sData = ReadFileToString(__sFilePath);
         string[] sDataList = sData.Split(' ').ToArray();
         int iTotalCount = 0;
+        ConcurrentBag<int> results = new ConcurrentBag<int>();
 
         DateTime dtStartTime = DateTime.Now;
 
+        // Parallel.ForEach(sDataList, (s) =>
+        // {
+        //     iTotalCount = CountStones([s]);
+        //     results.Add(iTotalCount);
+        // });
+
         iTotalCount = CountStones(sDataList);
+
 
         DateTime dtEndTime = DateTime.Now;
 
         TimeSpan tsDifference = dtEndTime - dtStartTime;
 
-        print($"Total number of stones after {__iMaxLevel} blinks in {tsDifference.TotalSeconds} seconds:  {__iTotalCount} stones ");
+        print($"Total number of stones after {__iMaxLevel} blinks in {tsDifference.TotalSeconds} seconds:  {results.Sum()} stones ");
+        print($"Total number of stones after {__iMaxLevel} blinks in {tsDifference.TotalSeconds} seconds:  {iTotalCount} stones ");
+
 
     }
 
