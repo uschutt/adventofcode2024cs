@@ -1,67 +1,71 @@
-﻿class Program11b
+﻿using System;
+using System.Threading;
+
+class Program11b
 {
     static string __sFilePath = "data.txt";
-    static int __iMaxLevel = 75;
+    static int __iMaxLevel = 25;
+    static int __iTotalCount = 0;
 
     static void Main(string[] args)
     {
         string sData = ReadFileToString(__sFilePath);
-        List<string> sDataList = sData.Split(' ').ToList();
-        int iBliks = 0;
+        string[] sDataList = sData.Split(' ').ToArray();
         int iTotalCount = 0;
 
         iTotalCount = CountStones(sDataList);
 
+        print($"Total number of stones after {__iMaxLevel} iterations is: {__iTotalCount} stones");
+
     }
 
-    static void PrintList(List<string> _sInputList, int _iX = 0)
+    static void PrintList(string _sStone, int _iX, int _iCount)
     {
-        // string sData = string.Join(' ', _sInputList);
         string sData = "";
-        print($"{_iX,2} | {_sInputList.Count,8} | {sData} ");
+        print($"{_iX,2} | {_iCount}");
+        // Thread.Sleep(10);
     }
 
 
-    static int CountStones(List<string> _sInputList, int _iLevel = 0, int _iTotalCount = 0)
+    static int CountStones(string[] _sStoneArray, int _iLevel = 0)
     {
-        List<string> sNewDataList = new List<string>();
         int iHalfString;
         ulong iNumber;
-        int iTotalCount = _iTotalCount;
+        int iTotalCount = 1;
+        string[] sNewStoneArray;
 
-        PrintList(_sInputList, _iLevel);
-
-        foreach (string s in _sInputList)
+        foreach (string s in _sStoneArray)
         {
-            if (s == "0")
+
+            if (_iLevel == __iMaxLevel)
             {
-                sNewDataList.Add("1");
-            }
-            else if (s.Length % 2 == 0)
-            {
-                iHalfString = s.Length / 2;
-                sNewDataList.Add(IntifyString(s.Substring(0, iHalfString)));
-                sNewDataList.Add(IntifyString(s.Substring(s.Length - iHalfString, iHalfString)));
-            }
-            else
-            {
-                iNumber = ulong.Parse(s) * 2024;
-                sNewDataList.Add($"{iNumber}");
+                __iTotalCount += iTotalCount;
             }
 
-        }
+            if (_iLevel < __iMaxLevel)
+            {
+                if (s == "0")
+                {
+                    sNewStoneArray = ["1"];
+                }
+                else if (s.Length % 2 == 0)
+                {
+                    iHalfString = s.Length / 2;
+                    sNewStoneArray = [IntifyString(s.Substring(0, iHalfString)), IntifyString(s.Substring(s.Length - iHalfString, iHalfString))];
+                    iTotalCount = 2;
+                }
+                else
+                {
+                    iNumber = ulong.Parse(s) * 2024;
+                    sNewStoneArray = [$"{iNumber}"];
+                }
 
-        if (_iLevel == __iMaxLevel)
-        {
-            iTotalCount += sNewDataList.Count;
-        }
-        else
-        {
-            iTotalCount += CountStones(sNewDataList, _iLevel + 1, iTotalCount);
+                iTotalCount += CountStones(sNewStoneArray, _iLevel + 1);
+
+            }
+
 
         }
-
-        sNewDataList.Clear();
 
         return iTotalCount;
 
