@@ -3,19 +3,22 @@ using System.Threading;
 
 class Program11b
 {
-    static string __sFilePath = "testdata.txt";
-    static int __iMaxLevel = 50;
+    static string __sFilePath = "data.txt";
+    static int __iMaxLevel = 40;
     static int __iTotalCount = 0;
 
     static void Main(string[] args)
     {
         string sData = ReadFileToString(__sFilePath);
         string[] sDataList = sData.Split(' ').ToArray();
-        int iTotalCount = 0;
 
         DateTime dtStartTime = DateTime.Now;
 
-        iTotalCount = CountStones(sDataList);
+        foreach (string s in sDataList)
+        {
+            CountStones(s);
+        }
+
 
         DateTime dtEndTime = DateTime.Now;
 
@@ -32,54 +35,44 @@ class Program11b
     }
 
 
-    static int CountStones(string[] _sStoneArray, int _iLevel = 0)
+    static void CountStones(string _sStone, int _iLevel = 0)
     {
         int iTotalCount = 1;
         string[] sNewStoneArray;
 
-        foreach (string s in _sStoneArray)
+        if (_iLevel == __iMaxLevel)
         {
-
-            if (_iLevel == __iMaxLevel)
-            {
-                __iTotalCount += iTotalCount;
-                continue; // Exit early?
-            }
-
-            if (_iLevel < __iMaxLevel)
-            {
-                if (s == "0")
-                {
-                    sNewStoneArray = ["1"];
-                }
-                else if (s.Length % 2 == 0)
-                {
-                    int iHalfString = s.Length / 2;
-
-                    string leftHalf = IntifyString(s.AsSpan(0, iHalfString).ToString()); // avoid using subsrings 
-                    string rightHalf = IntifyString(s.AsSpan(s.Length - iHalfString, iHalfString).ToString()); // avoid using subsrings 
-
-                    sNewStoneArray = [leftHalf, rightHalf];
-
-                    iTotalCount = 2;
-                }
-                else
-                {
-                    ulong iNumber = ulong.Parse(s) * 2024;
-                    sNewStoneArray = [iNumber.ToString()];
-                }
-
-                iTotalCount += CountStones(sNewStoneArray, _iLevel + 1);
-
-            }
-
-
+            __iTotalCount += iTotalCount;
         }
+        else
+        {
+            if (_sStone == "0")
+            {
+                sNewStoneArray = ["1"];
+            }
+            else if (_sStone.Length % 2 == 0)
+            {
+                int iHalfString = _sStone.Length / 2;
 
-        return iTotalCount;
+                string leftHalf = IntifyString(_sStone.AsSpan(0, iHalfString).ToString()); // avoid using subsrings 
+                string rightHalf = IntifyString(_sStone.AsSpan(_sStone.Length - iHalfString, iHalfString).ToString()); // avoid using subsrings 
 
+                sNewStoneArray = [leftHalf, rightHalf];
+
+                iTotalCount = 2;
+            }
+            else
+            {
+                ulong iNumber = ulong.Parse(_sStone) * 2024;
+                sNewStoneArray = [iNumber.ToString()];
+            }
+
+            foreach (string s in sNewStoneArray)
+            {
+                CountStones(s, _iLevel + 1);
+            }
+        }
     }
-
 
     static string IntifyString(string _sInput)
     {
