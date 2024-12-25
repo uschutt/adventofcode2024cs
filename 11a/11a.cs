@@ -8,15 +8,23 @@
         List<string> sDataList = sData.Split(' ').ToList();
         int iBliks = 0;
 
-        PrintList(sDataList, iBliks);
+        DateTime dtStartTime = DateTime.Now;
+
+        // PrintList(sDataList, iBliks);
         iBliks++;
 
         while (iBliks <= 25)
         {
             sDataList = RebuildList(sDataList);
-            PrintList(sDataList, iBliks);
+            // PrintList(sDataList, iBliks);
             iBliks++;
         }
+
+        DateTime dtEndTime = DateTime.Now;
+
+        TimeSpan tsDifference = dtEndTime - dtStartTime;
+
+        print($"Total number of stones after {iBliks - 1} blinks: {sDataList.Count} stones in {tsDifference.TotalSeconds} seconds");
 
     }
 
