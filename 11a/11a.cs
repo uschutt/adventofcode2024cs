@@ -10,13 +10,13 @@
 
         DateTime dtStartTime = DateTime.Now;
 
-        // PrintList(sDataList, iBliks);
+        PrintList(sDataList, iBliks);
         iBliks++;
 
         while (iBliks <= 25)
         {
             sDataList = RebuildList(sDataList);
-            // PrintList(sDataList, iBliks);
+            PrintList(sDataList, iBliks);
             iBliks++;
         }
 
