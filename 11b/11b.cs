@@ -3,8 +3,8 @@ using System.Threading;
 
 class Program11b
 {
-    static string __sFilePath = "data.txt";
-    static int __iMaxLevel = 25;
+    static string __sFilePath = "testdata.txt";
+    static int __iMaxLevel = 50;
     static int __iTotalCount = 0;
 
     static void Main(string[] args)
@@ -13,15 +13,20 @@ class Program11b
         string[] sDataList = sData.Split(' ').ToArray();
         int iTotalCount = 0;
 
+        DateTime dtStartTime = DateTime.Now;
+
         iTotalCount = CountStones(sDataList);
 
-        print($"Total number of stones after {__iMaxLevel} iterations is: {__iTotalCount} stones");
+        DateTime dtEndTime = DateTime.Now;
+
+        TimeSpan tsDifference = dtEndTime - dtStartTime;
+
+        print($"Total number of stones after {__iMaxLevel} blinks in {tsDifference.TotalSeconds} seconds:  {__iTotalCount} stones ");
 
     }
 
     static void PrintList(string _sStone, int _iX, int _iCount)
     {
-        string sData = "";
         print($"{_iX,2} | {_iCount}");
         // Thread.Sleep(10);
     }
@@ -29,8 +34,6 @@ class Program11b
 
     static int CountStones(string[] _sStoneArray, int _iLevel = 0)
     {
-        int iHalfString;
-        ulong iNumber;
         int iTotalCount = 1;
         string[] sNewStoneArray;
 
@@ -40,6 +43,7 @@ class Program11b
             if (_iLevel == __iMaxLevel)
             {
                 __iTotalCount += iTotalCount;
+                continue; // Exit early?
             }
 
             if (_iLevel < __iMaxLevel)
@@ -50,14 +54,19 @@ class Program11b
                 }
                 else if (s.Length % 2 == 0)
                 {
-                    iHalfString = s.Length / 2;
-                    sNewStoneArray = [IntifyString(s.Substring(0, iHalfString)), IntifyString(s.Substring(s.Length - iHalfString, iHalfString))];
+                    int iHalfString = s.Length / 2;
+
+                    string leftHalf = IntifyString(s.AsSpan(0, iHalfString).ToString()); // avoid using subsrings 
+                    string rightHalf = IntifyString(s.AsSpan(s.Length - iHalfString, iHalfString).ToString()); // avoid using subsrings 
+
+                    sNewStoneArray = [leftHalf, rightHalf];
+
                     iTotalCount = 2;
                 }
                 else
                 {
-                    iNumber = ulong.Parse(s) * 2024;
-                    sNewStoneArray = [$"{iNumber}"];
+                    ulong iNumber = ulong.Parse(s) * 2024;
+                    sNewStoneArray = [iNumber.ToString()];
                 }
 
                 iTotalCount += CountStones(sNewStoneArray, _iLevel + 1);
@@ -74,7 +83,9 @@ class Program11b
 
     static string IntifyString(string _sInput)
     {
-        return $"{ulong.Parse(_sInput)}";
+        // return ulong.Parse(_sInput).ToString();
+        string result = _sInput.TrimStart('0');
+        return result == string.Empty ? "0" : result;
     }
 
     static string ReadFileToString(string _sFilePath)
