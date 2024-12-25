@@ -51,17 +51,22 @@ class Program11b
                 // use function StepStone to split current stone according to rules in StepStone function
                 // break down the stone and add new stones created by the StepStone function to the empty dict newStones
                 // the value added is the number of occurencies the current stone generates for the next run
+                // Example: 
+                // this level:  stone "2" exists 4 times i previous level
+                //              rules in StepStone creates 4 stones with key "4048" (2*2024)
+                // next level:  4 stones with key 4048 creates 4 stones with key "40" and another 4 stones with key "48"                
                 foreach (string newStoneKey in StepStone(stone.Key))
                 {
+
+                    // the value for the new stone inherits the value from previous stone
+                    // Key is the number written on the stone
+                    // Value is the number of times the stone exists
                     if (newStones.ContainsKey(newStoneKey))
                     {
 
                         if (_bDebug) PrintDebugRow(i, newStoneKey, newStones[newStoneKey], stone.Value, stone.Key);
 
-                        // for exampel: 
-                        // this level:  stone "2" exists 4 times i previous level
-                        //              rules in StepStone creates 4 stones with key "4048" (2*2024)
-                        // next level:  4 stones with key 4048 creates 4 stones with key "40" and another 4 stones with key "48"
+                        // if there is already a stone with the same number the count (Value) gets added to the existing count (Value)
                         newStones[newStoneKey] += stone.Value;
 
                     }
@@ -70,6 +75,7 @@ class Program11b
 
                         if (_bDebug) PrintDebugRow(i, newStoneKey, 0, stone.Value, stone.Key);
 
+                        // if there is not already a stone with the number a new key gets added to the dictionary
                         newStones[newStoneKey] = stone.Value;
 
                     }
