@@ -41,7 +41,7 @@ class Program12a
             for (int y = 0; y <= theMap.yMax; y++)
             {
                 cCurrentPlotType = theMap.TypeByXY(x, y);
-                PlotsList.AddPlot(cCurrentPlotType);
+                PlotsList.AddPlot(cCurrentPlotType, new Position(x, y));
             }
 
         }

@@ -72,4 +72,6 @@ class Position
         return $"({x,2},{y,2})";
     }
 
+    public override string ToString() => Description();
+
 }

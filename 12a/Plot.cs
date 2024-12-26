@@ -6,21 +6,15 @@ class Plot
     public List<Position> PositionList;
     public Position StartPosition;
 
-    public Plot(char _cPlotType, int _iPerimiter = 0, int _iArea = 1, Position _oStartPosition)
+    public Plot(char _cPlotType, Position _oStartPosition, int _iPerimiter = 0, int _iArea = 1)
     {
         PlotType = _cPlotType;
         Area = _iArea;
         Perimiter = _iPerimiter;
         StartPosition = _oStartPosition;
+        PositionList = new List<Position>();
         PositionList.Add(_oStartPosition);
 
-    }
-
-    public static Plot operator +(Plot obj1, Plot obj2)
-    {
-        int iPerimiter = obj1.Perimiter + obj2.Perimiter;
-        int iArea = obj1.Area + obj2.Area;
-        return new Plot(obj1.PlotType, iPerimiter, iArea);
     }
 
     public static bool operator ==(Plot obj1, Plot obj2)
@@ -54,12 +48,12 @@ class Plot
         return HashCode.Combine(PlotType);
     }
 
-    public override string ToString() => $"Type: {PlotType} | Area: {Area,3} | Perimiter: {Perimiter,3}";
+    public override string ToString() => $"Type: {PlotType} | Area: {Area,3} | Perimiter: {Perimiter,3} | Start position: {StartPosition.ToString()}";
 
-    public string Description()
-    {
-        return $"Type: {PlotType} | Area: {Area} | Perimiter: {Perimiter}";
-    }
+    // public string Description()
+    // {
+    //     return $"Type: {PlotType} | Area: {Area} | Perimiter: {Perimiter}";
+    // }
 
 }
 
@@ -77,9 +71,10 @@ class Plots
         get { return __Plots; }
     }
 
-    public void AddPlot(char _PlotType, int _iPerimiter = 0, int _iArea = 1)
+    public void AddPlot(char _PlotType, Position _oPosition, int _iPerimiter = 0, int _iArea = 1)
     {
-        Plot oNewPlot = new Plot(_PlotType, _iPerimiter, _iArea);
+        Plot oNewPlot = new Plot(_PlotType, _oPosition, _iPerimiter, _iArea);
+
         if (!__Plots.Contains(oNewPlot))
         {
             Console.WriteLine($"New Plot:     {oNewPlot.ToString()}");
@@ -88,8 +83,14 @@ class Plots
         else
         {
             Plot FoundPlot = __Plots.Find(p => p.PlotType == _PlotType);
+
+            // does the position in _oPosition have a path to FoundPlot.StartPosition
+            // PositionsIsInSameRegion(_oPosition, FoundPlot.StartPosition, _PlotType)
+            // if not add new with oPosition as startPosition
+
             FoundPlot.Area += oNewPlot.Area;
             FoundPlot.Perimiter += oNewPlot.Perimiter;
+            FoundPlot.PositionList.Add(_oPosition);
             Console.WriteLine($"Updated Plot: {FoundPlot.ToString()}");
 
         }
