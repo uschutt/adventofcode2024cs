@@ -95,3 +95,4 @@ appsettings.*.json
 testdata.txt 
 data.txt
 result*.txt
+*.xlsx
