@@ -1,11 +1,37 @@
-﻿class ProgramDDa
+﻿using System;
+
+class ProgramDDa
 {
     static string __sFilePath = "testdata.txt";
 
     static void Main(string[] args)
     {
+        int iResult;
+
         List<string> sDataList = ReadFileToList(__sFilePath);
         foreach (string sLine in sDataList) print(sLine);
+
+        DateTime dtStartTime = DateTime.Now;
+
+        iResult = Solution(sDataList);
+
+        DateTime dtEndTime = DateTime.Now;
+
+        TimeSpan tsDifference = dtEndTime - dtStartTime;
+
+        print("------------------------------------------------------------------------------------------------------------------------------------------");
+        print($"| Result: {iResult} | calculated in {tsDifference.TotalSeconds} seconds");
+        print("------------------------------------------------------------------------------------------------------------------------------------------");
+
+    }
+
+    static int Solution(List<string> _sDataList)
+    {
+        int iResult = 0;
+
+        // solve the problem
+
+        return iResult;
     }
 
     static string ReadFileToString(string _sFilePath)
