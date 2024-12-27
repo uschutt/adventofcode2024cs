@@ -69,7 +69,7 @@ class Position
 
     public string Description()
     {
-        return $"({x,2},{y,2})";
+        return $"({x,3},{y,3})";
     }
 
     public override string ToString() => Description();

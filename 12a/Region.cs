@@ -1,27 +1,52 @@
+using System.Diagnostics;
 using System.Threading;
 
 class Region
 {
     public char __Type;
-    private List<Position> __Plots = new List<Position>();
-    private Position __StartPosition;
-
+    private Plots __Plots;
+    private Plot __StartPosition;
+    private int __TotalArea;
+    private int __TotalPerimiter;
 
     public char Type
     {
         get { return __Type; }
     }
 
-    public Position StartPosition
+    public Plot StartPosition
     {
         get { return __StartPosition; }
     }
 
-    public Region(char _Type, Position _StartPosition)
+    public Plots Plots
+    {
+        get { return __Plots; }
+    }
+
+    public int TotalArea
+    {
+        get { return __TotalArea; }
+    }
+
+    public int TotalPerimiter
+    {
+        get { return __TotalPerimiter; }
+    }
+
+    public int Price
+    {
+        get { return __TotalArea * __TotalPerimiter; }
+    }
+
+    public Region(char _Type, Plot _StartPosition)
     {
         __Type = _Type;
         __StartPosition = _StartPosition;
-        AddPlot(_StartPosition);
+        __Plots = new Plots();
+        __Plots.AddPlot(_StartPosition);
+        __TotalArea += _StartPosition.Area;
+        __TotalPerimiter += _StartPosition.Perimiter;
     }
 
     public static bool operator ==(Region obj1, Region obj2)
@@ -52,21 +77,29 @@ class Region
 
     public override int GetHashCode()
     {
-        return HashCode.Combine(__Type, __StartPosition.x, __StartPosition.y);
+        return HashCode.Combine(__Type, __StartPosition.Position.x, __StartPosition.Position.y);
     }
 
-    public bool AddPlot(Position _p)
+    public bool AddPlot(Plot _p)
     {
-        if (__Plots.Contains(_p)) return false;
-        __Plots.Add(_p);
-        return true;
+        if (__Plots.AddPlot(_p))
+        {
+            __TotalArea += _p.Area;
+            __TotalPerimiter += _p.Perimiter;
+            return true;
+        }
+        return false;
+
     }
 
-    public string GetDescription()
+    public string Description()
     {
         string sReturnValue = "";
 
-        sReturnValue = $"Type: {Type} | Start position: {__StartPosition.Description()}";
+        sReturnValue = $"Region type: {Type} ";
+        sReturnValue += $"| Start position: {__StartPosition.Position.Description()} ";
+        sReturnValue += $"| Area: {__TotalArea,4} | Perimiter: {__TotalPerimiter,3} ";
+        sReturnValue += $"| Price: {Price,5}";
 
         return sReturnValue;
     }
@@ -75,62 +108,129 @@ class Region
 
 class Regions
 {
-    List<Region> __RegionList;
-    Map __Map;
+    private List<Region> __RegionList;
+    private Map __Map;
+    private int __TotalPrice;
+    private int __TotalArea;
+    private Position[] __Directions;
 
     public Regions(Map _Map)
     {
         __RegionList = new List<Region>();
         __Map = _Map;
+        __Directions = GetDirections();
+        __TotalPrice = 0;
+        __TotalArea = 0;
     }
 
-    public Region TypeExists(Char _Type)
+    public int TotalPrice
     {
-        foreach (Region r in __RegionList)
+        get { return __TotalPrice; }
+    }
+
+    public int TotalArea
+    {
+        get { return __TotalArea; }
+    }
+
+    public List<Region> Items
+    {
+        get { return __RegionList; }
+    }
+
+    public bool RegionExists(char _Type, Plot _StartPosition)
+    {
+
+        foreach (Region r in __RegionList.FindAll(p => p.Type == _Type))
         {
-            if (r.Type == _Type) return r;
+            int index = r.Plots.Items.FindIndex(p => p.Position == _StartPosition.Position);
+            if (index != -1) return true;
         }
-        return null;
+
+        return false;
+
     }
 
-    public void AddRegion(char _Type, Position _StartPosition)
+    public Region AddRegion(char _Type, Plot _StartPosition)
     {
+        _StartPosition.Perimiter = PerimiterCount(_StartPosition);
         Region oNewRegion = new Region(_Type, _StartPosition);
-        _StartPosition.print($"New {_Type} region starting at ");
+
         GetPositions(_Type, _StartPosition, oNewRegion);
         __RegionList.Add(oNewRegion);
+        __TotalPrice += oNewRegion.Price;
+        __TotalArea += oNewRegion.TotalArea;
+
+        return oNewRegion;
+
     }
 
-    public void GetPositions(char _Type, Position _StartPosition, Region _Region)
+    public void GetPositions(char _Type, Plot _StartPosition, Region _Region)
     {
-        Position[] Directions = GetDirections();
-        Position oCurrentPosition = _StartPosition;
 
-        Console.WriteLine($"GetPositions  {_StartPosition.Description()}");
-        Thread.Sleep(100);
+        Plots NewPlots = GetAdjectantPlots(_Region, _StartPosition);
+        Plots TempPlots = new Plots();
 
-        foreach (Position oDirection in Directions)
+        while (NewPlots.Items.Count > 0)
         {
-            // oCurrentPosition = oCurrentPosition + oDirection;
-            while (__Map.ValidPosition(oCurrentPosition))
+            foreach (Plot p in NewPlots.Items)
             {
-                if (__Map.TypeByPosition(oCurrentPosition) == _Type)
+                p.Perimiter = PerimiterCount(p);
+                if (_Region.AddPlot(p))
                 {
-                    if (_Region.AddPlot(oCurrentPosition)) oCurrentPosition.print($"Type {_Type} | added: ");
-
-                    oCurrentPosition = oCurrentPosition + oDirection;
+                    TempPlots.AddPlot(p);
                 }
+            }
 
-                oCurrentPosition = oCurrentPosition + oDirection;
-                if (!__Map.ValidPosition(oCurrentPosition)) break;
-                GetPositions(_Type, oCurrentPosition, _Region);
+            NewPlots.Items.Clear();
+
+            foreach (Plot p in TempPlots.Items)
+            {
+
+                Plots adjectants = GetAdjectantPlots(_Region, p);
+
+                foreach (Plot a in adjectants.Items)
+                {
+                    NewPlots.AddPlot(a);
+                }
 
             }
 
-            oCurrentPosition = _StartPosition;
-
+            TempPlots.Items.Clear();
 
         }
+
+    }
+
+    private Plots GetAdjectantPlots(Region _Region, Plot _oPlot)
+    {
+        Plots NewPlots = new Plots();
+
+        foreach (Position Direction in __Directions)
+        {
+            Position NextPosition = _oPlot.Position + Direction;
+            if (__Map.TypeByPosition(NextPosition) == _oPlot.PlotType)
+            {
+                Plot NextPlot = new Plot(_oPlot.PlotType, NextPosition);
+                if (!_Region.Plots.Items.Contains(NextPlot))
+                {
+                    NewPlots.AddPlot(NextPlot);
+                }
+            }
+        }
+
+        return NewPlots;
+    }
+
+    private int PerimiterCount(Plot _p)
+    {
+        int iAdjectantCount = 0;
+        foreach (Position Direction in __Directions)
+        {
+            Position NextPosition = _p.Position + Direction;
+            if (__Map.TypeByPosition(NextPosition) == _p.PlotType) iAdjectantCount++;
+        }
+        return 4 - iAdjectantCount;
     }
 
     static Position[] GetDirections()
@@ -142,9 +242,14 @@ class Regions
         return [pUp, pDown, pLeft, pRight];
     }
 
+    public string Description()
+    {
+        string sReturnValue;
+        sReturnValue = $"Total number of regions: {__RegionList.Count} | Total area: {__TotalArea} | Total price: {__TotalPrice}";
+        return sReturnValue;
+    }
+
 }
-
-
 
 class Map
 {
@@ -169,17 +274,27 @@ class Map
 
     public char TypeByXY(int x, int y)
     {
-        return __map[x][y];
+        return TypeByPosition(new Position(x, y));
     }
 
     public char TypeByPosition(Position _oPosition)
     {
-        return __map[_oPosition.x][_oPosition.y];
+        if (ValidPosition(_oPosition))
+        {
+            return __map[_oPosition.x][_oPosition.y];
+        }
+        return '-';
     }
 
     public bool ValidPosition(Position _p)
     {
-        return (_p.x >= 0 && _p.y >= 0 && _p.x <= xMax && _p.y <= yMax);
+        return _p.x >= 0 && _p.y >= 0 && _p.x <= xMax && _p.y <= yMax;
+    }
+
+    public string Description()
+    {
+        string sReturnValue = $"Map dimensions: {xMax + 1} x {yMax + 1} | Area: {(xMax + 1) * (yMax + 1)} | Max index (x,y): ({xMax},{yMax}) ";
+        return sReturnValue;
     }
 
 }

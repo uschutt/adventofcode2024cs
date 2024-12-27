@@ -3,18 +3,14 @@ class Plot
     public char PlotType;
     public int Perimiter;
     public int Area;
-    public List<Position> PositionList;
-    public Position StartPosition;
+    public Position Position;
 
-    public Plot(char _cPlotType, Position _oStartPosition, int _iPerimiter = 0, int _iArea = 1)
+    public Plot(char _cPlotType, Position _oPosition, int _iPerimiter = 0, int _iArea = 1)
     {
         PlotType = _cPlotType;
         Area = _iArea;
         Perimiter = _iPerimiter;
-        StartPosition = _oStartPosition;
-        PositionList = new List<Position>();
-        PositionList.Add(_oStartPosition);
-
+        Position = _oPosition;
     }
 
     public static bool operator ==(Plot obj1, Plot obj2)
@@ -25,7 +21,7 @@ class Plot
             return false; // One is null, and the other is not
 
         // Compare property values
-        return obj1.PlotType == obj2.PlotType;
+        return obj1.PlotType == obj2.PlotType && obj1.Position == obj2.Position;
     }
 
     public static bool operator !=(Plot obj1, Plot obj2)
@@ -48,12 +44,12 @@ class Plot
         return HashCode.Combine(PlotType);
     }
 
-    public override string ToString() => $"Type: {PlotType} | Area: {Area,3} | Perimiter: {Perimiter,3} | Start position: {StartPosition.ToString()}";
+    public override string ToString() => Description();
 
-    // public string Description()
-    // {
-    //     return $"Type: {PlotType} | Area: {Area} | Perimiter: {Perimiter}";
-    // }
+    public string Description()
+    {
+        return $"Type: {PlotType} | Area: {Area,3} | Perimiter: {Perimiter,3} | Position: {Position.ToString()}";
+    }
 
 }
 
@@ -71,32 +67,24 @@ class Plots
         get { return __Plots; }
     }
 
-    public void AddPlot(char _PlotType, Position _oPosition, int _iPerimiter = 0, int _iArea = 1)
+    public bool AddPlot(char _PlotType, Position _oPosition, int _iPerimiter = 0, int _iArea = 1)
     {
         Plot oNewPlot = new Plot(_PlotType, _oPosition, _iPerimiter, _iArea);
+        return AddPlot(oNewPlot);
+    }
 
-        if (!__Plots.Contains(oNewPlot))
+    public bool AddPlot(Plot _p)
+    {
+        if (!__Plots.Contains(_p))
         {
-            Console.WriteLine($"New Plot:     {oNewPlot.ToString()}");
-            __Plots.Add(oNewPlot);
+            // Console.WriteLine($"New Plot:     {oNewPlot.ToString()}");
+            __Plots.Add(_p);
+            return true;
         }
         else
         {
-            Plot FoundPlot = __Plots.Find(p => p.PlotType == _PlotType);
-
-            // does the position in _oPosition have a path to FoundPlot.StartPosition
-            // PositionsIsInSameRegion(_oPosition, FoundPlot.StartPosition, _PlotType)
-            // if not add new with oPosition as startPosition
-
-            FoundPlot.Area += oNewPlot.Area;
-            FoundPlot.Perimiter += oNewPlot.Perimiter;
-            FoundPlot.PositionList.Add(_oPosition);
-            Console.WriteLine($"Updated Plot: {FoundPlot.ToString()}");
-
+            return false;
         }
-
     }
-
-
 
 }

@@ -2,14 +2,14 @@
 
 class Program12a
 {
-    static string __sFilePath = "testdata.txt";
+    static string __sFilePath = "data.txt";
 
     static void Main(string[] args)
     {
         int iResult;
 
         List<string> sDataList = ReadFileToList(__sFilePath);
-        foreach (string sLine in sDataList) print(sLine);
+        // foreach (string sLine in sDataList) print(sLine);
 
         DateTime dtStartTime = DateTime.Now;
 
@@ -27,13 +27,13 @@ class Program12a
 
     static int Solution(List<string> _sDataList)
     {
-        int iResult = 0;
-
         Map theMap = new Map(_sDataList);
-        // Regions RegionList = new Regions(theMap);
-        Plots PlotsList = new Plots();
+        Regions RegionList = new Regions(theMap);
 
-        char cPreviousPlotType = '-';
+        print("");
+        print(theMap.Description());
+        print("");
+
         char cCurrentPlotType;
 
         for (int x = 0; x <= theMap.xMax; x++)
@@ -41,17 +41,36 @@ class Program12a
             for (int y = 0; y <= theMap.yMax; y++)
             {
                 cCurrentPlotType = theMap.TypeByXY(x, y);
-                PlotsList.AddPlot(cCurrentPlotType, new Position(x, y));
+
+                // crate plot
+                Plot newPlot = new Plot(cCurrentPlotType, new Position(x, y));
+
+                // create region 
+                if (!RegionList.RegionExists(cCurrentPlotType, newPlot))
+                {
+                    Region newRegion = RegionList.AddRegion(cCurrentPlotType, newPlot);
+                    print(newRegion.Description());
+                }
+                // break;
+
             }
+            // break;
 
         }
 
-        foreach (Plot p in PlotsList.Items)
-        {
-            print(p.ToString());
-        }
+        // foreach (Region r in RegionList.Items)
+        // {
+        //     foreach (Plot p in r.Plots.Items)
+        //     {
+        //         print(p.ToString());
+        //     }
+        //     print(r.Description());
+        // }
 
-        return iResult;
+        print("");
+        print(RegionList.Description());
+
+        return RegionList.TotalPrice;
     }
 
     static string ReadFileToString(string _sFilePath)
