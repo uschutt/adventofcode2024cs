@@ -5,12 +5,12 @@ using System.Threading;
 
 class Region
 {
-    public char __Type;
+    private char __Type;
     private Plots __Plots;
     private Plot __StartPosition;
     private int __TotalArea;
     private int __TotalPerimiter;
-    private List<Plots> __Sides;
+    private List<Side> __Sides;
 
     public char Type
     {
@@ -42,7 +42,12 @@ class Region
         get { return __TotalArea * __TotalPerimiter; }
     }
 
-    public List<Plots> Sides
+    public int PriceWithDiscount
+    {
+        get { return __TotalArea * __Sides.Count; }
+    }
+
+    public List<Side> Sides
     {
         get { return __Sides; }
     }
@@ -54,8 +59,8 @@ class Region
         __Plots = new Plots();
         __Plots.AddPlot(_StartPosition);
         __TotalArea += _StartPosition.Area;
-        __TotalPerimiter += _StartPosition.Perimiter;
-        __Sides = new List<Plots>();
+        __TotalPerimiter += _StartPosition.PerimiterCount;
+        __Sides = new List<Side>();
     }
 
     public static bool operator ==(Region obj1, Region obj2)
@@ -94,11 +99,78 @@ class Region
         if (__Plots.AddPlot(_p))
         {
             __TotalArea += _p.Area;
-            __TotalPerimiter += _p.Perimiter;
+            __TotalPerimiter += _p.PerimiterCount;
             return true;
         }
         return false;
 
+    }
+
+
+
+    public void CreateSides()
+    {
+        // for each plot in the region
+        foreach (Plot p in __Plots.Items)
+        {
+            // only Plots with at least one perimiter can be part of a side
+            if (p.PerimiterCount > 0)
+            {
+                foreach (Side side in GetSides(p))
+                {
+                    side.Plots.AddPlot(p);
+                }
+            }
+        }
+    }
+
+    private List<Side> GetSides(Plot _p)
+    {
+        List<Side> FoundSides = new List<Side>();
+        foreach (Side side in __Sides)
+        {
+            foreach (Plot p in side.Plots.Items)
+            {
+                if (AdjectantPlots(_p, p, side.Direction))
+                {
+                    FoundSides.Add(side);
+                    break; // a plot can only be added once to each side, so why keep looking
+                }
+            }
+        }
+
+        // if the _p does not fit in any existing side, 
+        // a new side for each of the plots perimiter is created
+        if (FoundSides.Count < _p.PerimiterCount)
+        {
+            foreach (Position perimiter in _p.Perimiters)
+            {
+                Side newSide = new Side(perimiter, _p);
+                if (!FoundSides.Contains(newSide))
+                {
+                    __Sides.Add(newSide);
+                    FoundSides.Add(newSide);
+                }
+
+            }
+        }
+
+        return FoundSides;
+    }
+
+    private bool AdjectantPlots(Plot _p1, Plot _p2, Position _Direction)
+    {
+
+        if (_p1.PerimiterCount == 0) return false;
+        if (_p2.PerimiterCount == 0) return false;
+
+        if (_p1.Perimiters.Contains(_Direction) && _p2.Perimiters.Contains(_Direction))
+        {
+            if (_p1.Position.x == _p2.Position.x && (_p1.Position.y == _p2.Position.y - 1 || _p1.Position.y == _p2.Position.y + 1)) return true;
+            if (_p1.Position.y == _p2.Position.y && (_p1.Position.x == _p2.Position.x - 1 || _p1.Position.x == _p2.Position.x + 1)) return true;
+        }
+
+        return false;
     }
 
     public string Description()
@@ -110,78 +182,26 @@ class Region
         sReturnValue += $"| Area: {__TotalArea,4} | Perimiter: {__TotalPerimiter,3} ";
         sReturnValue += $"| Sides: {__Sides.Count,3}";
         sReturnValue += $"| Price: {Price,5}";
+        sReturnValue += $"| Price with discount: {PriceWithDiscount,5}";
 
         return sReturnValue;
     }
 
-    public void CreateSides()
+    public string Export(bool _bHeader = false)
     {
+        string sReturnValue = "";
 
-
-        foreach (Plot p in __Plots.Items)
+        if (_bHeader)
         {
-            if (p.Perimiter > 0) // only Plots with at least one perimiter can be part of a side
-            {
-                if (p.Perimiter == 4)
-                {
-                    for (int i = 1; i <= 4; i++) __Sides.Add(CreateSide(p));
-                }
-                else
-                {
-                    foreach (Plots side in GetSides(p))
-                    {
-                        side.AddPlot(p);
-                    }
-                }
-            }
+            sReturnValue += "RegionType;StartPositionX;StartPositionY;Area;PerimiterCount;SideCount;Price1;Price2";
+        }
+        else
+        {
+            sReturnValue += $"{Type};{__StartPosition.Position.x};{__StartPosition.Position.y};{__TotalArea};{__TotalPerimiter};{__Sides.Count};{Price};{PriceWithDiscount}";
         }
 
+        return sReturnValue;
     }
-
-    private List<Plots> GetSides(Plot _p)
-    {
-        List<Plots> FoundSides = new List<Plots>();
-        foreach (Plots side in __Sides)
-        {
-            foreach (Plot p in side.Items)
-            {
-                if (AdjectantPlots(_p, p))
-                {
-                    FoundSides.Add(side);
-                    break; // a plot can only be added once to each side, so why keep looking
-                }
-            }
-        }
-
-        // if the _p does not fit in any existing side, a new side is created and returned
-        // a side for each of the plots perimiter is created
-        if (FoundSides.Count == 0)
-        {
-            for (int i = 1; i <= _p.Perimiter; i++) FoundSides.Add(CreateSide(_p));
-        }
-
-
-        return FoundSides;
-    }
-
-    private bool AdjectantPlots(Plot _p1, Plot _p2)
-    {
-        if (_p1.Perimiter == 0) return false;
-        if (_p2.Perimiter == 0) return false;
-        if (_p1.Position.x == _p2.Position.x && (_p1.Position.y == _p2.Position.y - 1 || _p1.Position.y == _p2.Position.y + 1)) return true;
-        if (_p1.Position.y == _p2.Position.y && (_p1.Position.x == _p2.Position.x - 1 || _p1.Position.x == _p2.Position.x + 1)) return true;
-        return false;
-    }
-
-    private Plots CreateSide(Plot _p)
-    {
-        Plots NewSide = new Plots();
-        NewSide.AddPlot(_p);
-        __Sides.Add(NewSide);
-        // Console.WriteLine($"Side created: {_p.Description()}");
-        return NewSide;
-    }
-
 }
 
 class Regions
@@ -189,6 +209,7 @@ class Regions
     private List<Region> __RegionList;
     private Map __Map;
     private int __TotalPrice;
+    private int __TotalPriceWithDiscount;
     private int __TotalArea;
     private Position[] __Directions;
 
@@ -198,12 +219,18 @@ class Regions
         __Map = _Map;
         __Directions = GetDirections();
         __TotalPrice = 0;
+        __TotalPriceWithDiscount = 0;
         __TotalArea = 0;
     }
 
     public int TotalPrice
     {
         get { return __TotalPrice; }
+    }
+
+    public int TotalPriceWithDiscount
+    {
+        get { return __TotalPriceWithDiscount; }
     }
 
     public int TotalArea
@@ -231,13 +258,14 @@ class Regions
 
     public Region AddRegion(char _Type, Plot _StartPosition)
     {
-        _StartPosition.Perimiter = PerimiterCount(_StartPosition);
+        _StartPosition.PerimiterCount = PerimiterCount(_StartPosition);
         Region oNewRegion = new Region(_Type, _StartPosition);
 
         GetPositions(_Type, _StartPosition, oNewRegion);
         oNewRegion.CreateSides();
         __RegionList.Add(oNewRegion);
         __TotalPrice += oNewRegion.Price;
+        __TotalPriceWithDiscount += oNewRegion.PriceWithDiscount;
         __TotalArea += oNewRegion.TotalArea;
 
 
@@ -255,7 +283,7 @@ class Regions
         {
             foreach (Plot p in NewPlots.Items)
             {
-                p.Perimiter = PerimiterCount(p);
+                p.PerimiterCount = PerimiterCount(p);
                 if (_Region.AddPlot(p))
                 {
                     TempPlots.AddPlot(p);
@@ -308,24 +336,32 @@ class Regions
         foreach (Position Direction in __Directions)
         {
             Position NextPosition = _p.Position + Direction;
-            if (__Map.TypeByPosition(NextPosition) == _p.PlotType) iAdjectantCount++;
+            if (__Map.TypeByPosition(NextPosition) == _p.PlotType)
+            {
+                iAdjectantCount++;
+            }
+            else if (!_p.Perimiters.Contains(Direction))
+            {
+                _p.Perimiters.Add(Direction);
+            }
         }
         return 4 - iAdjectantCount;
     }
 
     static Position[] GetDirections()
     {
-        Position pUp = new Position(0, -1);
-        Position pDown = new Position(0, 1);
-        Position pLeft = new Position(-1, 0);
-        Position pRight = new Position(1, 0);
+        Position pUp = new Position(-1, 0, "up");
+        Position pDown = new Position(1, 0, "down");
+        Position pLeft = new Position(0, -1, "left");
+        Position pRight = new Position(0, 1, "right");
         return [pUp, pDown, pLeft, pRight];
     }
 
     public string Description()
     {
-        string sReturnValue;
-        sReturnValue = $"Total number of regions: {__RegionList.Count} | Total area: {__TotalArea} | Total price: {__TotalPrice}";
+        string sReturnValue = "";
+        sReturnValue += $"Total number of regions: {__RegionList.Count} | Total area: {__TotalArea} | Total price: {__TotalPrice}";
+        sReturnValue += $" | Total price with discount: {__TotalPriceWithDiscount}";
         return sReturnValue;
     }
 
@@ -377,4 +413,112 @@ class Map
         return sReturnValue;
     }
 
+    public List<string> Export()
+    {
+        List<string> ReturnList = new List<string>();
+
+        string sHeader = "x\\y;";
+        for (int y = 0; y <= yMax; y++)
+        {
+            sHeader += $"{y};";
+        }
+
+        ReturnList.Add(sHeader);
+
+        int iX = 0;
+        foreach (string x in __map)
+        {
+            string sLine = string.Join(";", x.ToArray());
+            sLine = $"{iX};" + sLine;
+            ReturnList.Add(sLine);
+            iX++;
+        }
+
+        return ReturnList;
+    }
+
+}
+
+class Side
+{
+    private Position __Direction;
+    private Plots __Plots;
+
+    #region Properties
+    public Position Direction
+    {
+        get { return __Direction; }
+    }
+
+    public Plots Plots
+    {
+        get { return __Plots; }
+    }
+
+    #endregion
+
+    #region Constructors
+
+    public Side(Position _Direction)
+    {
+        __Direction = _Direction;
+        __Plots = new Plots();
+    }
+
+    public Side(Position _Direction, Plot _Plot)
+    {
+        __Direction = _Direction;
+        __Plots = new Plots();
+        AddPlot(_Plot);
+    }
+
+    #endregion
+
+    #region Operators
+
+    public static bool operator ==(Side obj1, Side obj2)
+    {
+        if (ReferenceEquals(obj1, obj2))
+            return true; // Both references point to the same object
+        if (obj1 is null || obj2 is null)
+            return false; // One is null, and the other is not
+
+        // Compare property values
+        return obj1.Direction == obj2.Direction;
+    }
+
+    public static bool operator !=(Side obj1, Side obj2)
+    {
+        return !(obj1 == obj2);
+    }
+
+    // frågetecknet(?) efter object markerar att obj kan vara null
+    public override bool Equals(object? obj)
+    {
+        if (obj is Side other)
+        {
+            return this == other;
+        }
+        return false;
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(Direction);
+    }
+
+    #endregion
+
+    public void AddPlot(Plot _Plot)
+    {
+        __Plots.AddPlot(_Plot);
+    }
+
+    public string Description(string _sPrefix = "")
+    {
+        string sReturnValue = "";
+        if (_sPrefix != "") sReturnValue += _sPrefix + " | ";
+        sReturnValue += $"Direction: {__Direction.Description()} | PlotCount: {__Plots.Items.Count} ";
+        return sReturnValue;
+    }
 }

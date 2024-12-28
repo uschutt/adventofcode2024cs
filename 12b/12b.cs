@@ -2,7 +2,7 @@
 
 class Program12b
 {
-    static string __sFilePath = "testdata.txt";
+    static string __sFilePath = "data.txt";
 
     static void Main(string[] args)
     {
@@ -22,6 +22,8 @@ class Program12b
         print("------------------------------------------------------------------------------------------------------------------------------------------");
         print($"| Result: {iResult} | calculated in {tsDifference.TotalSeconds} seconds");
         print("------------------------------------------------------------------------------------------------------------------------------------------");
+
+        // 821737 wrong answer - too high
 
     }
 
@@ -56,7 +58,42 @@ class Program12b
 
         }
 
-        foreach (Region r in RegionList.Items)
+        // DebugPrint(RegionList);
+        ExportRegions(RegionList);
+        ExportMap(theMap);
+
+        print();
+        print(RegionList.Description());
+
+        return RegionList.TotalPriceWithDiscount;
+    }
+
+    static void ExportRegions(Regions _RegionList, string _filePath = "results.txt")
+    {
+        using (StreamWriter writer = new StreamWriter(_filePath))
+        {
+            writer.WriteLine(_RegionList.Items[0].Export(true));
+            foreach (Region r in _RegionList.Items)
+            {
+                writer.WriteLine(r.Export());
+            }
+        }
+    }
+
+    static void ExportMap(Map _map, string _filePath = "map.txt")
+    {
+        using (StreamWriter writer = new StreamWriter(_filePath))
+        {
+            foreach (string s in _map.Export())
+            {
+                writer.WriteLine(s);
+            }
+        }
+    }
+
+    static void DebugPrint(Regions _RegionList)
+    {
+        foreach (Region r in _RegionList.Items)
         {
             // foreach (Plot p in r.Plots.Items) print(p.ToString());
             // print(r.Description());
@@ -64,22 +101,26 @@ class Program12b
             if (r.Type == 'M')
             {
                 int iSide = 0;
-                foreach (Plots ps in r.Sides)
+                foreach (Side ps in r.Sides)
                 {
                     iSide++;
-                    print($"{r.Type} side {iSide}");
-                    foreach (Plot p in ps.Items)
+                    print();
+                    print(ps.Description($"{r.Type} side {iSide}"));
+                    foreach (Plot p in ps.Plots.Items)
                     {
                         print($"{p.Description()}");
                     }
                 }
+                // foreach (Plot p in r.Plots.Items)
+                // {
+                //     print($"Plot {p.Description()} sides:");
+                //     foreach (Position side in p.Perimiters)
+                //     {
+                //         print($" - {side.Description()}");
+                //     }
+                // }
             }
         }
-
-        print("");
-        print(RegionList.Description());
-
-        return RegionList.TotalPrice;
     }
 
     static string ReadFileToString(string _sFilePath)
@@ -107,7 +148,7 @@ class Program12b
         return sLinesList;
     }
 
-    static void print(string sText)
+    static void print(string sText = "")
     {
         Console.WriteLine(sText);
     }

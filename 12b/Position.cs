@@ -2,11 +2,20 @@ class Position
 {
     public int x;
     public int y;
+    public string name;
 
     public Position(int _x, int _y)
     {
         x = _x; // horisontal / col / string
         y = _y; // vertical   / row / item
+        name = "";
+    }
+
+    public Position(int _x, int _y, string _name)
+    {
+        x = _x; // horisontal / col / string
+        y = _y; // vertical   / row / item
+        name = _name;
     }
 
     public static Position operator -(Position obj1, Position obj2)
@@ -69,6 +78,8 @@ class Position
 
     public string Description()
     {
+        if (name != "") return $"({x,3},{y,3}) {name}";
+
         return $"({x,3},{y,3})";
     }
 

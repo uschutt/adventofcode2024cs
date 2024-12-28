@@ -1,16 +1,19 @@
 class Plot
 {
     public char PlotType;
-    public int Perimiter;
+    public int PerimiterCount;
     public int Area;
     public Position Position;
+    public List<Position> Perimiters;
 
-    public Plot(char _cPlotType, Position _oPosition, int _iPerimiter = 0, int _iArea = 1)
+
+    public Plot(char _cPlotType, Position _oPosition, int _iPerimiterCount = 0, int _iArea = 1)
     {
         PlotType = _cPlotType;
         Area = _iArea;
-        Perimiter = _iPerimiter;
+        PerimiterCount = _iPerimiterCount;
         Position = _oPosition;
+        Perimiters = new List<Position>();
     }
 
     public static bool operator ==(Plot obj1, Plot obj2)
@@ -48,7 +51,7 @@ class Plot
 
     public string Description()
     {
-        return $"Type: {PlotType} | Area: {Area,3} | Perimiter: {Perimiter,3} | Position: {Position.ToString()}";
+        return $"Type: {PlotType} | Area: {Area,3} | PerimiterCount: {PerimiterCount,3} | Position: {Position.ToString()}";
     }
 
 }
