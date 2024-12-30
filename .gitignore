@@ -92,7 +92,5 @@ appsettings.*.json
 *.db
 *.sqlite
 
-testdata.txt 
-data.txt
 result*.txt
 *.xlsx
