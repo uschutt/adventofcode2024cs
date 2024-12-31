@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Security.Cryptography.X509Certificates;
-using System.Xml;
 
 class Program13a
 {
@@ -32,8 +30,6 @@ class Program13a
         int iResult = 0;
 
         // solve the problem
-        // iResult = CalculateTotalCost(new Position(1, 1), new Position(8400, 5400), 94, 34, 3, 22, 67, 1);
-
         iResult = CalculateCost();
 
         return iResult;
