@@ -43,86 +43,36 @@ class Program13a
     {
         Position _oInitPosition = new Position(0, 0);
         Position _oiTargetPosition = new Position(8400, 5400);
-        Position oAMove = new Position(94, 34);
-        Position oBMove = new Position(22, 67);
+        Position _oAMove = new Position(94, 34);
+        Position _oBMove = new Position(22, 67);
         Position oPosition = _oInitPosition;
 
         int A = 0;
         int B;
 
-        for (Position pA = _oInitPosition; pA < _oiTargetPosition; pA += oAMove)
+        for (Position pA = _oInitPosition; pA < _oiTargetPosition; pA += _oAMove)
         {
-            A++;
             B = 0;
-            for (Position pB = pA; pB < _oiTargetPosition; pB += oBMove)
+            for (Position pB = _oInitPosition; pB < _oiTargetPosition; pB += _oBMove)
             {
-                B++;
+
                 oPosition = pA + pB;
-                print($"A: {A,3} | B: {B,3} | {oPosition.Description()}");
+                print($"A: {A,3} {pA.Description()} | B: {B,3} {pB.Description()} | {oPosition.Description()}");
                 if (oPosition == _oiTargetPosition)
                 {
                     print("This is it!");
                     return 1;
                 }
-                if (oPosition > _oiTargetPosition) break;
-
+                if (pB > _oiTargetPosition) break;
+                B++;
             }
-            if (oPosition > _oiTargetPosition) break;
-
+            if (pA > _oiTargetPosition) break;
+            A++;
         }
 
         return -1;
 
-        // Position p = GetPosition(new Position(1, 1), 1, 1, 94, 34);
-
     }
-
-
-    static Position GetPosition(Position _oInitPosition, int _iXCount, int _iYCount, int _iXValue, int _iYValue)
-    {
-
-        Position oMove = new Position(_iXCount * _iXValue, _iYCount * _iYValue);
-        return _oInitPosition += oMove;
-
-    }
-
-
-    // alla kombinationer av antal tryck på a från 1 till 89
-
-    // static int CalculateTotalCost(Position _oInitPosition, Position _oiTargetPosition, int _iAXValue, int _iAYValue, int _iACost, int _iBXValue, int _iBYValue, int _iBCost)
-    // {
-
-    //     int x = _oInitPosition.x;
-    //     int y = _oInitPosition.y;
-    //     Position p = _oInitPosition;
-
-    //     int iXCount = 0;
-    //     int iYCount = 0;
-
-    //     int iAXMax = (_oiTargetPosition.x - _oInitPosition.x) / _iAXValue;
-    //     int iAYMax = (_oiTargetPosition.y - _oInitPosition.y) / _iAYValue;
-
-    //     int iBXMax = (_oiTargetPosition.x - _oInitPosition.x) / _iBXValue;
-    //     int iBYMax = (_oiTargetPosition.y - _oInitPosition.y) / _iBYValue;
-
-    //     for (int ax = 1; ax < 89; ax++)
-    //     {
-    //         for (int ay = 1; ay <= 158; ax++)
-    //         {
-    //             for (int bx = 1; bx < 381; bx++)
-    //             {
-    //                 for (int by = 1; by <= 80; ax++)
-    //                 {
-    //                     x += ax * _iAXValue;
-    //                     y += ay * _iAYValue;
-    //                     p = new Position(x,y)
-    //                 }
-    //             }
-    //         }
-    //     }
-
-    //     return iAXMax;
-    // }
 
     static string ReadFileToString(string _sFilePath)
     {
