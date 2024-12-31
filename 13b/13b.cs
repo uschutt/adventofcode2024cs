@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 
 class Program13b
 {
-    static string __sFilePath = "data.txt";
+    static string __sFilePath = "testdata.txt";
 
     static void Main(string[] args)
     {
