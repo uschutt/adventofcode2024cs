@@ -1,17 +1,17 @@
 class Position
 {
-    public int x;
-    public int y;
+    public ulong x;
+    public ulong y;
     public string name;
 
-    public Position(int _x, int _y)
+    public Position(ulong _x, ulong _y)
     {
         x = _x; // horisontal / col / string
         y = _y; // vertical   / row / item
         name = "";
     }
 
-    public Position(int _x, int _y, string _name)
+    public Position(ulong _x, ulong _y, string _name)
     {
         x = _x; // horisontal / col / string
         y = _y; // vertical   / row / item
@@ -22,7 +22,7 @@ class Position
 
     public static Position operator -(Position obj1, Position obj2)
     {
-        int x, y;
+        ulong x, y;
 
         x = obj1.x - obj2.x;
         y = obj1.y - obj2.y;
@@ -32,10 +32,30 @@ class Position
 
     public static Position operator +(Position obj1, Position obj2)
     {
-        int x, y;
+        ulong x, y;
 
         x = obj1.x + obj2.x;
         y = obj1.y + obj2.y;
+
+        return new Position(x, y);
+    }
+
+    public static Position operator *(Position obj1, ulong Factor)
+    {
+        ulong x, y;
+
+        x = obj1.x * Factor;
+        y = obj1.y * Factor;
+
+        return new Position(x, y);
+    }
+
+    public static Position operator *(ulong Factor, Position obj1)
+    {
+        ulong x, y;
+
+        x = obj1.x * Factor;
+        y = obj1.y * Factor;
 
         return new Position(x, y);
     }
@@ -63,7 +83,7 @@ class Position
     public static bool operator ==(Position obj1, Position obj2)
     {
         if (ReferenceEquals(obj1, obj2))
-            return true; // Both references point to the same object
+            return true; // Both references poulong to the same object
         if (obj1 is null || obj2 is null)
             return false; // One is null, and the other is not
 
