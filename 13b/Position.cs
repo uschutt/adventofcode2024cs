@@ -1,28 +1,35 @@
 class Position
 {
-    public ulong x;
-    public ulong y;
+    public long x;
+    public long y;
     public string name;
 
-    public Position(ulong _x, ulong _y)
+    public Position(long _x, long _y)
     {
         x = _x; // horisontal / col / string
         y = _y; // vertical   / row / item
         name = "";
     }
 
-    public Position(ulong _x, ulong _y, string _name)
+    public Position(long _x, long _y, string _name)
     {
         x = _x; // horisontal / col / string
         y = _y; // vertical   / row / item
         name = _name;
     }
 
-
+    public string Description
+    {
+        get
+        {
+            if (name != "") return $"({x,4},{y,4}) {name}";
+            return $"({x,4},{y,4})";
+        }
+    }
 
     public static Position operator -(Position obj1, Position obj2)
     {
-        ulong x, y;
+        long x, y;
 
         x = obj1.x - obj2.x;
         y = obj1.y - obj2.y;
@@ -32,7 +39,7 @@ class Position
 
     public static Position operator +(Position obj1, Position obj2)
     {
-        ulong x, y;
+        long x, y;
 
         x = obj1.x + obj2.x;
         y = obj1.y + obj2.y;
@@ -40,9 +47,9 @@ class Position
         return new Position(x, y);
     }
 
-    public static Position operator *(Position obj1, ulong Factor)
+    public static Position operator *(Position obj1, long Factor)
     {
-        ulong x, y;
+        long x, y;
 
         x = obj1.x * Factor;
         y = obj1.y * Factor;
@@ -50,34 +57,46 @@ class Position
         return new Position(x, y);
     }
 
-    public static Position operator *(ulong Factor, Position obj1)
+    public static Position operator *(long Factor, Position obj1)
     {
-        ulong x, y;
+        long x, y;
 
         x = obj1.x * Factor;
         y = obj1.y * Factor;
 
         return new Position(x, y);
+    }
+
+    public static long operator /(Position obj1, Position obj2)
+    {
+        long x, y;
+
+        x = obj1.x / obj2.x;
+        y = obj1.y / obj2.y;
+
+        if (x <= y) return x;
+        else return y;
+
     }
 
     public static bool operator <=(Position obj1, Position obj2)
     {
-        return obj1.x <= obj2.x || obj1.y <= obj2.y;
+        return obj1.x <= obj2.x && obj1.y <= obj2.y;
     }
 
     public static bool operator >=(Position obj1, Position obj2)
     {
-        return obj1.x >= obj2.x || obj1.y >= obj2.y;
+        return obj1.x >= obj2.x && obj1.y >= obj2.y;
     }
 
     public static bool operator <(Position obj1, Position obj2)
     {
-        return obj1.x < obj2.x || obj1.y < obj2.y;
+        return obj1.x < obj2.x && obj1.y < obj2.y;
     }
 
     public static bool operator >(Position obj1, Position obj2)
     {
-        return obj1.x > obj2.x || obj1.y > obj2.y;
+        return obj1.x > obj2.x && obj1.y > obj2.y;
     }
 
     public static bool operator ==(Position obj1, Position obj2)
@@ -113,18 +132,11 @@ class Position
 
     public void print(string _prefix = "")
     {
-        string sText = Description();
+        string sText = Description;
         if (_prefix != "") sText = $"{_prefix}{sText}";
         Console.WriteLine(sText);
     }
 
-    public string Description()
-    {
-        if (name != "") return $"({x,3},{y,3}) {name}";
-
-        return $"({x,3},{y,3})";
-    }
-
-    public override string ToString() => Description();
+    public override string ToString() => Description;
 
 }
